@@ -124,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisCount: 2,
                     mainAxisSpacing: 12,
                     crossAxisSpacing: 12,
-                    childAspectRatio: 1.45,
+                    childAspectRatio: 1.3,
                     children: [
                       _ServiceTile(
                         n: 'i',
@@ -227,12 +227,16 @@ class _SectionTitle extends StatelessWidget {
         ),
       ),
       const SizedBox(width: 10),
-      Text(
-        title,
-        style: const TextStyle(
-          fontSize: 26,
-          fontWeight: FontWeight.w700,
-          letterSpacing: -0.8,
+      Flexible(
+        child: Text(
+          title,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.8,
+          ),
         ),
       ),
     ],
@@ -273,6 +277,8 @@ class _ServiceTile extends StatelessWidget {
             ),
             Text(
               label,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w600,

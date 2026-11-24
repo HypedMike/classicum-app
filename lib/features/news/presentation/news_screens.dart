@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:classicum_admin/core/ui/admin_top_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:classicum_admin/core/network/uploads.dart';
 import 'package:classicum_admin/core/theme.dart';
@@ -74,7 +75,7 @@ class _NewsListScreenState extends State<NewsListScreen> {
   Widget build(BuildContext context) {
     final repo = context.read<NewsRepository>();
     return Scaffold(
-      appBar: AppBar(title: const Text('News')),
+      appBar: AdminTopBar(title: 'News'),
       floatingActionButton: FloatingActionButton(
         tooltip: 'Nuova news',
         onPressed: () => _open(),
@@ -190,7 +191,7 @@ class _NewsFormScreenState extends State<NewsFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_editing ? 'Modifica news' : 'Nuova news')),
+      appBar: AdminTopBar(title: _editing ? 'Modifica news' : 'Nuova news'),
       body: Form(
         key: _form,
         child: ListView(

@@ -19,7 +19,7 @@ class ClassicumApp extends StatelessWidget {
     super.key,
     required this.deps,
     required this.auth,
-    this.minSplash = const Duration(milliseconds: 3200),
+    this.minSplash = const Duration(milliseconds: 4400),
   });
 
   /// How long the splash stays up at least (long enough for the particles to

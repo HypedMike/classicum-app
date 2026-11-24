@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:classicum_admin/core/ui/admin_top_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:classicum_admin/core/network/uploads.dart';
 import 'package:classicum_admin/core/ui/image_picker_field.dart';
@@ -77,7 +78,7 @@ class _EventFormScreenState extends State<EventFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Nuovo evento')),
+      appBar: AdminTopBar(title: 'Nuovo evento'),
       body: Form(
         key: _form,
         child: ListView(
