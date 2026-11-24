@@ -35,13 +35,7 @@ void main() {
         'A & B\n<c> "d" \'e\'',
       );
       expect(stripHtml('Uno<br>Due<br/>Tre'), 'Uno\nDue\nTre');
-      expect(stripHtml('<p>a</p>
-
-
-
-<p>b</p>'), 'a
-
-b');
+      expect(stripHtml('<p>a</p>\n\n\n\n<p>b</p>'), 'a\n\nb');
     });
   });
 
