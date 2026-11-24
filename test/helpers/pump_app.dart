@@ -10,7 +10,9 @@ Future<void> pumpApp(WidgetTester tester, FakeBackend b) async {
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
   final auth = AuthController(b.deps.auth);
-  await tester.pumpWidget(ClassicumApp(deps: b.deps, auth: auth));
+  await tester.pumpWidget(
+    ClassicumApp(deps: b.deps, auth: auth, minSplash: Duration.zero),
+  );
   await auth.restore();
   await tester.pumpAndSettle();
 }
