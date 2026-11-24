@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:classicum_admin/core/ui/admin_top_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:classicum_admin/core/theme.dart';
 import 'package:classicum_admin/core/ui/widgets.dart';
@@ -49,7 +50,7 @@ class _ComunicatiListScreenState extends State<ComunicatiListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Comunicati stampa')),
+      appBar: AdminTopBar(title: 'Comunicati stampa'),
       floatingActionButton: FloatingActionButton(
         tooltip: 'Nuovo comunicato',
         onPressed: () => _open(),
@@ -164,10 +165,8 @@ class _ComunicatoFormScreenState extends State<ComunicatoFormScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          widget.item == null ? 'Nuovo comunicato' : 'Modifica comunicato',
-        ),
+      appBar: AdminTopBar(
+        title: widget.item == null ? 'Nuovo comunicato' : 'Modifica comunicato',
       ),
       body: Form(
         key: _form,

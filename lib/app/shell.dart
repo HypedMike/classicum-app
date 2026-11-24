@@ -41,35 +41,90 @@ class _ShellState extends State<Shell> {
         bottom: false,
         child: IndexedStack(index: _index, children: pages),
       ),
-      bottomNavigationBar: NavigationBarTheme(
-        data: NavigationBarThemeData(
-          backgroundColor: Palette.ink,
-          indicatorColor: Colors.transparent,
-          labelTextStyle: WidgetStateProperty.resolveWith(
-            (s) => TextStyle(
-              fontSize: 11,
-              fontWeight: s.contains(WidgetState.selected)
-                  ? FontWeight.w700
-                  : FontWeight.w500,
-              color: s.contains(WidgetState.selected)
-                  ? Palette.cream
-                  : const Color(0xFFD9D2C3),
+      bottomNavigationBar: _FloatingNavBar(
+        tabs: _tabs,
+        index: _index,
+        onSelected: _go,
+      ),
+    );
+  }
+}
+
+/// Rounded bar floating above the page, with a soft shadow (as in the mock-up).
+class _FloatingNavBar extends StatelessWidget {
+  const _FloatingNavBar({
+    required this.tabs,
+    required this.index,
+    required this.onSelected,
+  });
+
+  final List<({String label, IconData icon})> tabs;
+  final int index;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: Container(
+        key: const Key('floating-nav-bar'),
+        margin: const EdgeInsets.fromLTRB(12, 4, 12, 12),
+        decoration: BoxDecoration(
+          color: Palette.ink,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x2E141414),
+              blurRadius: 24,
+              offset: Offset(0, 8),
             ),
-          ),
-          iconTheme: WidgetStateProperty.resolveWith(
-            (s) => IconThemeData(
-              color: s.contains(WidgetState.selected)
-                  ? Palette.gold
-                  : const Color(0xFFD9D2C3),
-            ),
-          ),
+          ],
         ),
-        child: NavigationBar(
-          selectedIndex: _index,
-          onDestinationSelected: _go,
-          destinations: [
-            for (final t in _tabs)
-              NavigationDestination(icon: Icon(t.icon), label: t.label),
+        padding: const EdgeInsets.fromLTRB(6, 8, 6, 10),
+        child: Row(
+          children: [
+            for (var i = 0; i < tabs.length; i++)
+              Expanded(
+                child: Semantics(
+                  button: true,
+                  selected: i == index,
+                  label: tabs[i].label,
+                  excludeSemantics: true,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: () => onSelected(i),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(minHeight: 56),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            tabs[i].icon,
+                            size: 24,
+                            color: i == index
+                                ? Palette.gold
+                                : const Color(0xFFD9D2C3),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            tabs[i].label,
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: i == index
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
+                              color: i == index
+                                  ? Palette.cream
+                                  : const Color(0xFFD9D2C3),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
       ),

@@ -1,4 +1,5 @@
 import 'package:material_ui/material_ui.dart';
+import 'package:classicum_admin/core/ui/admin_top_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:classicum_admin/core/pagination.dart';
 import 'package:classicum_admin/core/theme.dart';
@@ -210,7 +211,7 @@ class _SubmissionsScreenState extends State<SubmissionsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_form.name)),
+      appBar: AdminTopBar(title: _form.name),
       body: RefreshIndicator(
         onRefresh: () => _load(reset: true),
         child: ListView(

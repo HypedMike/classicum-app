@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:classicum_admin/app/app.dart';
 import 'package:classicum_admin/features/auth/presentation/auth_controller.dart';
 import 'package:classicum_admin/features/splash/presentation/particle_field.dart';
-import 'package:classicum_admin/features/splash/presentation/particle_system.dart';
+import 'package:classicum_admin/features/splash/presentation/wall_scene.dart';
 import 'package:classicum_admin/features/splash/presentation/splash_screen.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -20,18 +20,18 @@ Widget host(Widget child, {bool disableAnimations = false}) => MediaQuery(
 void main() {
   setUpAll(() => initializeDateFormatting('it'));
 
+  LuccaWallsScene scene() => LuccaWallsScene(random: Random(3));
+
   testWidgets('the splash paints the particles and animates them', (
     tester,
   ) async {
-    final system = ParticleSystem(random: Random(3));
-    await tester.pumpWidget(
-      host(Scaffold(body: ParticleField(system: system))),
-    );
-    expect(system.particles, isNotEmpty);
-    final before = system.particles.first.x;
+    final s = scene();
+    await tester.pumpWidget(host(Scaffold(body: ParticleField(scene: s))));
+    await tester.pump(const Duration(milliseconds: 16));
+    final before = s.screen[0];
     await tester.pump(const Duration(milliseconds: 500));
     await tester.pump(const Duration(milliseconds: 500));
-    expect(system.particles.first.x, isNot(before));
+    expect(s.screen[0], isNot(before));
     expect(
       find.descendant(
         of: find.byType(ParticleField),
@@ -41,58 +41,56 @@ void main() {
     );
   });
 
-  testWidgets('particles reach the drawing after a few seconds', (
-    tester,
-  ) async {
-    final system = ParticleSystem(random: Random(3));
-    await tester.pumpWidget(
-      host(Scaffold(body: ParticleField(system: system))),
-    );
-    for (var i = 0; i < 200; i++) {
+  testWidgets('the walls sway while the particles settle', (tester) async {
+    final s = scene();
+    await tester.pumpWidget(host(Scaffold(body: ParticleField(scene: s))));
+    final rotations = <double>{};
+    for (var i = 0; i < 300; i++) {
       await tester.pump(const Duration(milliseconds: 20));
+      if (i % 50 == 0) rotations.add(s.rotationY);
     }
-    final off = system.particles.where((p) {
-      final dx = p.x - p.target.x, dy = p.y - p.target.y;
-      return sqrt(dx * dx + dy * dy) > 6;
-    });
-    expect(off, isEmpty);
+    expect(rotations.length, greaterThan(3));
   });
 
-  testWidgets('tapping scatters the particles again', (tester) async {
-    final system = ParticleSystem(random: Random(3));
-    await tester.pumpWidget(
-      host(Scaffold(body: ParticleField(system: system))),
-    );
-    for (var i = 0; i < 200; i++) {
+  testWidgets('pressing gathers the particles around the finger', (
+    tester,
+  ) async {
+    final s = scene();
+    await tester.pumpWidget(host(Scaffold(body: ParticleField(scene: s))));
+    for (var i = 0; i < 100; i++) {
       await tester.pump(const Duration(milliseconds: 20));
     }
-    await tester.tap(find.byType(ParticleField));
-    final off = system.particles.where((p) {
-      final dx = p.x - p.target.x, dy = p.y - p.target.y;
-      return sqrt(dx * dx + dy * dy) > 20;
-    });
-    expect(off.length, greaterThan(system.particles.length * 0.8));
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.byType(ParticleField)),
+    );
+    expect(s.hasPointer, isTrue);
+    for (var i = 0; i < 150; i++) {
+      await tester.pump(const Duration(milliseconds: 20));
+    }
+    expect(s.gather, greaterThan(0.3));
+    await gesture.up();
+    expect(s.hasPointer, isFalse);
+    for (var i = 0; i < 300; i++) {
+      await tester.pump(const Duration(milliseconds: 20));
+    }
+    expect(s.gather, lessThan(0.05));
   });
 
   testWidgets('with reduced motion the drawing is static and nothing ticks', (
     tester,
   ) async {
-    final system = ParticleSystem(random: Random(3));
+    final s = scene();
     await tester.pumpWidget(
-      host(
-        Scaffold(body: ParticleField(system: system)),
-        disableAnimations: true,
-      ),
+      host(Scaffold(body: ParticleField(scene: s)), disableAnimations: true),
     );
     // No running ticker: pumpAndSettle returns immediately.
     await tester.pumpAndSettle();
-    expect(
-      system.particles.every((p) => p.x == p.target.x && p.y == p.target.y),
-      isTrue,
-    );
-    // Tapping doesn't scatter it.
+    final first = List<double>.of(s.screen.take(20));
+    // Tapping doesn't gather anything.
     await tester.tap(find.byType(ParticleField));
-    expect(system.particles.first.x, system.particles.first.target.x);
+    await tester.pumpAndSettle();
+    expect(s.gather, 0);
+    expect(List<double>.of(s.screen.take(20)), first);
   });
 
   testWidgets('the splash screen shows the name and an accessible label', (
@@ -107,7 +105,7 @@ void main() {
     );
     expect(
       find.bySemanticsLabel(
-        'Animazione: particelle dorate che disegnano le Mura di Lucca',
+        'Animazione: particelle dorate che disegnano in 3D le Mura di Lucca',
       ),
       findsOneWidget,
     );
