@@ -26,6 +26,27 @@ I token sono salvati nello storage sicuro del dispositivo e rinnovati
 automaticamente alla prima risposta 401. L'account deve essere attivo
 (`AdminUser.isActive = true`).
 
+## Struttura
+
+Organizzata per feature: ogni feature ha il proprio `data/` (modelli + repository)
+e `presentation/` (schermate). Ciò che è condiviso sta in `core/`.
+
+```
+lib/
+  app/            composizione: AppDependencies, MaterialApp, navigazione a tab
+  core/           config, tema, client HTTP, token store, widget condivisi
+  features/
+    auth/         login, sessione
+    home/         "Oggi"
+    agenda/       eventi
+    news/
+    comunicati/
+    forms/        moduli e risposte
+    messages/     messaggi dal modulo contatti
+    profile/
+test/             rispecchia lib/ (core/, features/<nome>/, helpers/)
+```
+
 ## Sviluppo
 
 ```bash

@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:classicum_admin/data/api_client.dart';
-import 'package:classicum_admin/data/repository.dart';
-import 'package:classicum_admin/data/token_store.dart';
+import 'package:classicum_admin/app/dependencies.dart';
+import 'package:classicum_admin/core/network/api_client.dart';
+import 'package:classicum_admin/core/network/token_store.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 
@@ -33,7 +33,7 @@ class FakeBackend {
       tokens: tokens,
       httpClient: client,
     );
-    repository = AdminRepository(api);
+    deps = AppDependencies(api);
   }
 
   final MemoryTokenStore tokens;
@@ -41,7 +41,7 @@ class FakeBackend {
   final List<http.Request> requests = [];
   late final MockClient client;
   late final ApiClient api;
-  late final AdminRepository repository;
+  late final AppDependencies deps;
 
   void json(String route, Object? body, {int status = 200}) {
     routes[route] = (_) => http.Response(
