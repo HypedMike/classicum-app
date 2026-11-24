@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:classicum_admin/app/dependencies.dart';
@@ -10,9 +12,19 @@ import 'package:classicum_admin/features/comunicati/data/comunicati_repository.d
 import 'package:classicum_admin/features/forms/data/forms_repository.dart';
 import 'package:classicum_admin/features/messages/data/messages_repository.dart';
 import 'package:classicum_admin/features/news/data/news_repository.dart';
+import 'package:classicum_admin/features/splash/presentation/splash_screen.dart';
 
 class ClassicumApp extends StatelessWidget {
-  const ClassicumApp({super.key, required this.deps, required this.auth});
+  const ClassicumApp({
+    super.key,
+    required this.deps,
+    required this.auth,
+    this.minSplash = const Duration(milliseconds: 3200),
+  });
+
+  /// How long the splash stays up at least (long enough for the particles to
+  /// draw the walls). Tests pass [Duration.zero].
+  final Duration minSplash;
 
   final AppDependencies deps;
   final AuthController auth;
@@ -32,20 +44,58 @@ class ClassicumApp extends StatelessWidget {
         title: 'Classicum Admin',
         debugShowCheckedModeBanner: false,
         theme: buildTheme(),
-        home: const _AuthGate(),
+        home: _AuthGate(minSplash: minSplash),
       ),
     );
   }
 }
 
-class _AuthGate extends StatelessWidget {
-  const _AuthGate();
+/// Shows the particle splash while the session is restored, for at least
+/// [minSplash] so the animation has time to form, then the right screen.
+class _AuthGate extends StatefulWidget {
+  const _AuthGate({required this.minSplash});
+
+  final Duration minSplash;
+
+  @override
+  State<_AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<_AuthGate> {
+  late bool _minElapsed = widget.minSplash == Duration.zero;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    if (!_minElapsed) {
+      _timer = Timer(widget.minSplash, () {
+        if (mounted) setState(() => _minElapsed = true);
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    switch (context.watch<AuthController>().status) {
+    final status = context.watch<AuthController>().status;
+    final showSplash = status == AuthStatus.unknown || !_minElapsed;
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 400),
+      child: showSplash
+          ? const SplashScreen(key: Key('splash'))
+          : KeyedSubtree(key: const Key('content'), child: _screenFor(status)),
+    );
+  }
+
+  Widget _screenFor(AuthStatus status) {
+    switch (status) {
       case AuthStatus.unknown:
-        return const Scaffold(body: Center(child: CircularProgressIndicator()));
       case AuthStatus.signedOut:
         return const LoginScreen();
       case AuthStatus.signedIn:
