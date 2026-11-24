@@ -23,8 +23,9 @@ class _FormsScreenState extends State<FormsScreen> {
     _future = context.read<FormsRepository>().forms();
   }
 
-  void _reload() =>
-      setState(() => _future = context.read<FormsRepository>().forms());
+  void _reload() => setState(() {
+    _future = context.read<FormsRepository>().forms();
+  });
 
   Future<void> _open(FormDefinition f) async {
     await Navigator.of(context)

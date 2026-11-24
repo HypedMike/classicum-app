@@ -62,8 +62,11 @@ flutter test
 
 - `.github/workflows/ci.yml`: su ogni push a `main` e PR esegue formattazione,
   `flutter analyze`, `flutter test --coverage` e costruisce un APK debug (artifact).
-- `.github/workflows/release.yml`: un tag `vX.Y.Z` esegue i test, costruisce APK e
-  app bundle release e li allega a una GitHub Release.
+- `.github/workflows/release.yml`: ad ogni push o merge su `main` incrementa
+  automaticamente la **minor** (`v0.1.0` → `v0.2.0` → …), crea il tag sul commit,
+  esegue i test, costruisce APK e app bundle release e li allega a una GitHub Release.
+  Si parte da `v0.1.0` se non esistono tag. Per una major o una patch, crea a mano
+  il tag/release (`vX.0.0`): il prossimo push incrementerà la minor da lì.
   Imposta la variabile di repository `API_BASE_URL` se il sito non è su `classicum.fly.dev`.
 
 > Le release sono firmate con la chiave di debug finché non viene configurata una

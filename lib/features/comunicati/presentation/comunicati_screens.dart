@@ -21,9 +21,9 @@ class _ComunicatiListScreenState extends State<ComunicatiListScreen> {
     _future = context.read<ComunicatiRepository>().comunicati();
   }
 
-  void _reload() => setState(
-    () => _future = context.read<ComunicatiRepository>().comunicati(),
-  );
+  void _reload() => setState(() {
+    _future = context.read<ComunicatiRepository>().comunicati();
+  });
 
   Future<void> _open([Comunicato? c]) async {
     final changed = await Navigator.of(context).push<bool>(

@@ -51,8 +51,9 @@ class _AgendaScreenState extends State<AgendaScreen> {
     _future = context.read<EventsRepository>().events();
   }
 
-  void _reload() =>
-      setState(() => _future = context.read<EventsRepository>().events());
+  void _reload() => setState(() {
+    _future = context.read<EventsRepository>().events();
+  });
 
   Future<void> _add() async {
     final created = await Navigator.of(context)
